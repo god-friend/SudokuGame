@@ -8,6 +8,9 @@
 #include <QIODevice>
 #include "showscores.h"
 
+
+// Public Members
+
 Sudoku::Sudoku(QWidget *parent): QMainWindow(parent)
     , ui(new Ui::Sudoku)
 {
@@ -25,6 +28,56 @@ Sudoku::~Sudoku()
 {
     delete ui;
 }
+
+void Sudoku::setVal(int n){
+    level = n;
+}
+int Sudoku::getLevel(){
+    return level;
+}
+
+// Private Slots
+
+void Sudoku::diffLevelClicked()
+{
+    selectLevel *s = new selectLevel(this);
+    s->setWindowFlags(Qt::FramelessWindowHint);
+    s->setModal(true);
+    s->setAttribute(Qt::WA_DeleteOnClose);
+    connect(s, SIGNAL(destroyed(QObject*)), this ,SLOT(changeStatus()));
+    s->show();
+}
+
+void Sudoku::changeStatus(){
+    QString str = "";
+    if(level == 1){
+        str = "Easy";
+    }else if(level == 2){
+        str = "Medium";
+    }else if(level == 3){
+        str = "Hard";
+    }
+
+    ui->statusBar->showMessage("Difficulty Level :: "+str);
+}
+
+void Sudoku::startGameBtnClicked()
+{
+    mainGame *game = new mainGame(this);
+    game->setAttribute(Qt::WA_DeleteOnClose);
+
+    game->show();
+
+}
+
+void Sudoku::myScoreBtn(){
+
+    showScores *scoresUI = new showScores(this);
+    scoresUI->setAttribute(Qt::WA_DeleteOnClose);
+    scoresUI->show();
+}
+
+// Private Members
 
 void Sudoku::createFiles(){
     QString path = QDir::currentPath() + QDir::separator() + "gameData";
@@ -48,51 +101,3 @@ void Sudoku::createFiles(){
         }
     }
 }
-
-void Sudoku::myScoreBtn(){
-
-    showScores *scoresUI = new showScores(this);
-    scoresUI->setAttribute(Qt::WA_DeleteOnClose);
-    scoresUI->show();
-}
-
-void Sudoku::setVal(int n){
-    level = n;
-}
-int Sudoku::getLevel(){
-    return level;
-}
-
-void Sudoku::changeStatus(){
-    QString str = "";
-    if(level == 1){
-        str = "Easy";
-    }else if(level == 2){
-        str = "Medium";
-    }else if(level == 3){
-        str = "Hard";
-    }
-
-    ui->statusBar->showMessage("Difficulty Level :: "+str);
-}
-
-void Sudoku::diffLevelClicked()
-{
-    selectLevel *s = new selectLevel(this);
-    s->setWindowFlags(Qt::FramelessWindowHint);
-    s->setModal(true);
-    s->setAttribute(Qt::WA_DeleteOnClose);
-    connect(s, SIGNAL(destroyed(QObject*)), this ,SLOT(changeStatus()));
-    s->show();
-}
-
-
-void Sudoku::startGameBtnClicked()
-{
-    mainGame *game = new mainGame(this);
-    game->setAttribute(Qt::WA_DeleteOnClose);
-
-    game->show();
-
-}
-

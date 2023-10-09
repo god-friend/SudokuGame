@@ -2,6 +2,9 @@
 #include "ui_selectlevel.h"
 #include "sudoku.h"
 
+
+// Public Members
+
 selectLevel::selectLevel(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::selectLevel)
@@ -15,6 +18,27 @@ selectLevel::~selectLevel()
 {
     delete ui;
 }
+
+
+// Private Slots
+
+void selectLevel::selectBtnClicked()
+{
+    Sudoku *p = (Sudoku *)parent();
+    if(ui->easy->isChecked()){
+        p->setVal(1);
+    }
+    if(ui->medium->isChecked()){
+        p->setVal(2);
+    }
+    if(ui->hard->isChecked()){
+        p->setVal(3);
+    }
+    this->close();
+}
+
+
+// Private Members
 
 void selectLevel::markLevel(){
     Sudoku *p = (Sudoku *)parent();
@@ -33,19 +57,4 @@ void selectLevel::markLevel(){
         qDebug() << "An Error Occured";
         return;
     }
-}
-
-void selectLevel::selectBtnClicked()
-{
-    Sudoku *p = (Sudoku *)parent();
-    if(ui->easy->isChecked()){
-        p->setVal(1);
-    }
-    if(ui->medium->isChecked()){
-        p->setVal(2);
-    }
-    if(ui->hard->isChecked()){
-        p->setVal(3);
-    }
-    this->close();
 }

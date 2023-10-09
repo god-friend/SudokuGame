@@ -3,6 +3,8 @@
 #include <QPen>
 #include <QGridLayout>
 
+// Public Members
+
 InputBtnWidget::InputBtnWidget(QWidget *parent): QWidget(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground);
@@ -11,6 +13,48 @@ InputBtnWidget::InputBtnWidget(QWidget *parent): QWidget(parent)
     widPosition = -1;
     initializeStyle();
 }
+
+void InputBtnWidget::createAtPosition(int pos, QRect rect){
+
+    QRect widRect = rect;
+    QPoint centerPoint = rect.center();
+    int xCenter = centerPoint.x() - (width / 2);
+
+    if(pos == UP){
+        widPosition = UP;
+
+        widRect.setX(xCenter);
+        widRect.setY(rect.y() - height);
+    }else if(pos == DOWN){
+        widPosition = DOWN;
+
+        widRect.setX(xCenter);
+        widRect.setY(rect.height() + rect.y());
+    }
+
+    widRect.setHeight(height);
+    widRect.setWidth(width);
+
+    this->setGeometry(widRect);
+
+    printButtons();
+}
+
+
+// Private Slots
+
+void InputBtnWidget::clickedBtn(){
+    QPushButton *btn = qobject_cast<QPushButton*> (sender());
+    mainGame *parent = qobject_cast<mainGame*>(this->parentWidget());
+
+    parent->changeBtnValue(btn->text().toInt());
+
+    this->close();
+}
+
+
+// Private Members
+
 
 void InputBtnWidget::initializeStyle(){
     btnStyle = "QPushButton{"
@@ -59,40 +103,9 @@ void InputBtnWidget::printButtons(){
     this->setLayout(grid);
 }
 
-void InputBtnWidget::clickedBtn(){
-    QPushButton *btn = qobject_cast<QPushButton*> (sender());
-    mainGame *parent = qobject_cast<mainGame*>(this->parentWidget());
 
-    parent->changeBtnValue(btn->text().toInt());
 
-    this->close();
-}
 
-void InputBtnWidget::createAtPosition(int pos, QRect rect){
-
-    QRect widRect = rect;
-    QPoint centerPoint = rect.center();
-    int xCenter = centerPoint.x() - (width / 2);
-
-    if(pos == UP){
-        widPosition = UP;
-
-        widRect.setX(xCenter);
-        widRect.setY(rect.y() - height);
-    }else if(pos == DOWN){
-        widPosition = DOWN;
-
-        widRect.setX(xCenter);
-        widRect.setY(rect.height() + rect.y());
-    }
-
-    widRect.setHeight(height);
-    widRect.setWidth(width);
-
-    this->setGeometry(widRect);
-
-    printButtons();
-}
 
 void InputBtnWidget::paintEvent(QPaintEvent *event){
     if(widPosition == -1){

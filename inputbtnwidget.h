@@ -22,6 +22,7 @@ private slots:
     void clickedBtn();
 
 private:
+    // Variables
     int height;
     int width;
     int widPosition;
@@ -29,9 +30,10 @@ private:
     QString btnStyle;
 
 
+    // Member Functions
     void initializeStyle();
-    void paintEvent(QPaintEvent *event);
     void printButtons();
+    void paintEvent(QPaintEvent *event);
 
 
 };

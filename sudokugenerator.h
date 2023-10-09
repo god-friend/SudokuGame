@@ -18,12 +18,14 @@ private:
     std::vector<std::vector<int>> sudokuBoard;
     std::vector<int> values;
 
-    bool valueUsedInBox(int row, int col, int val);
+
     void fillDiagnols();
     void fillBox(int row, int col);
 
-    bool solveSudoku(std::vector<std::vector<int>> &board);
+    bool valueUsedInBox(int row, int col, int val);
     bool isSafe(int row, int col, int val, std::vector<std::vector<int>> board);
+    bool solveSudoku(std::vector<std::vector<int>> &board);
+
     static bool notInRow(std::vector<std::vector<int>> board);
     static bool notInCol(std::vector<std::vector<int>> board);
     static bool checkBox(int row, int col, std::vector<std::vector<int>> board);

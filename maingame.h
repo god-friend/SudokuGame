@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QString>
 #include <QResizeEvent>
+#include <vector>
 #include "inputbtnwidget.h"
 
 namespace Ui {
@@ -33,6 +34,7 @@ private slots:
     void setNull();
 
 private:
+    // Variables
     Ui::mainGame *ui;
 
     QPushButton *selectedBtn;
@@ -42,6 +44,7 @@ private:
     QWidget *centralWid;
 
     QTime *time;
+
     QTimer *timer;
 
     QString emptyStyle;
@@ -53,22 +56,23 @@ private:
     int currentHighlighted;
     int level;
 
-    InputBtnWidget *inputButtons;
-
     std::vector<std::vector<int>> solvedPuzzle;
     std::vector<std::vector<int>> unSolvedPuzzle;
 
+    InputBtnWidget *inputButtons;
 
+    // Member Functions
     QFrame *createLine(QString type);
 
+    void initializeStyles();
     void createGrid();
     void beginTimer();
     void gameCompletedMessage();
-    void initializeStyles();
     void clearHighlightedNumbers();
     void resizeEvent(QResizeEvent *event);
 
     bool saveDataToFile(QString takenTime);
+
 
 
 };

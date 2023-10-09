@@ -7,6 +7,7 @@
 #include <QIODevice>
 #include "sudoku.h"
 
+// Public Members
 
 showScores::showScores(QWidget *parent) :
     QWidget(parent),
@@ -25,6 +26,37 @@ showScores::showScores(QWidget *parent) :
     connect(ui->backBtn, SIGNAL(clicked(bool)), this, SLOT(goBack()));
 
     getAndPrintScores();
+}
+
+showScores::~showScores()
+{
+    delete ui;
+}
+
+
+// Private Slots
+
+void showScores::goBack(){
+    centralWid->setVisible(true);
+    Sudoku *p = qobject_cast<Sudoku*>( parentWidget());
+    p->setCentralWidget(centralWid);
+
+    close();
+}
+
+
+// Private Members
+
+void showScores::getAndPrintScores(){
+    std::vector<GameData<QString>> easyScores = readFile("easy.dat");
+    showFileContents("easyWid", easyScores);
+
+    std::vector<GameData<QString>> mediumScores = readFile("medium.dat");
+    showFileContents("mediumWid", mediumScores);
+
+    std::vector<GameData<QString>> hardScores = readFile("hard.dat");
+    showFileContents("hardWid", hardScores);
+
 }
 
 std::vector<GameData<QString>> showScores::readFile(QString filename){
@@ -108,29 +140,4 @@ void showScores::showFileContents(QString widgetName, std::vector<GameData<QStri
     }else{
         widLayout->deleteLater();
     }
-}
-
-void showScores::getAndPrintScores(){
-    std::vector<GameData<QString>> easyScores = readFile("easy.dat");
-    showFileContents("easyWid", easyScores);
-
-    std::vector<GameData<QString>> mediumScores = readFile("medium.dat");
-    showFileContents("mediumWid", mediumScores);
-
-    std::vector<GameData<QString>> hardScores = readFile("hard.dat");
-    showFileContents("hardWid", hardScores);
-
-}
-
-void showScores::goBack(){
-    centralWid->setVisible(true);
-    Sudoku *p = qobject_cast<Sudoku*>( parentWidget());
-    p->setCentralWidget(centralWid);
-
-    close();
-}
-
-showScores::~showScores()
-{
-    delete ui;
 }

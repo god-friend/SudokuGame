@@ -3,6 +3,9 @@
 #include <random>
 #include <algorithm>
 
+
+// Public Members
+
 SudokuGenerator::SudokuGenerator()
 {
     sudokuBoard = std::vector(BOARD_SIZE, std::vector<int>(BOARD_SIZE, EMPTY_VALUE));
@@ -17,16 +20,39 @@ std::vector<std::vector<int>> SudokuGenerator::generateSudoku(){
 
 }
 
-bool SudokuGenerator::valueUsedInBox(int row, int col, int val){
+std::vector<std::vector<int>> SudokuGenerator::removeKElements(int k){
+    std::vector<std::vector<int>> newPuzzle = sudokuBoard;
 
-    for(int i=0; i<3; i++){
-        for(int j=0; j<3; j++){
-            if(sudokuBoard[row+i][col+j] == val){
-                return true;
-            }
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::srand(seed);
+
+    int i = 0;
+    while(i < k){
+        int r = rand() % 9;
+        int c = rand() % 9;
+        if(newPuzzle[r][c] != EMPTY_VALUE){
+            newPuzzle[r][c] = EMPTY_VALUE;
+            i++;
         }
     }
-    return false;
+
+
+    return newPuzzle;
+}
+
+bool SudokuGenerator::validateSudoku(std::vector<std::vector<int>> board){
+    return  notInRow(board) && notInCol(board) && notInBox(board);
+}
+
+
+// Private Members
+
+void SudokuGenerator::fillDiagnols(){
+
+    for(int i=0; i<9; i+=3){
+        fillBox(i, i);
+    }
+
 }
 
 void SudokuGenerator::fillBox(int row, int col){
@@ -47,12 +73,16 @@ void SudokuGenerator::fillBox(int row, int col){
 
 }
 
-void SudokuGenerator::fillDiagnols(){
+bool SudokuGenerator::valueUsedInBox(int row, int col, int val){
 
-    for(int i=0; i<9; i+=3){
-        fillBox(i, i);
+    for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+            if(sudokuBoard[row+i][col+j] == val){
+                return true;
+            }
+        }
     }
-
+    return false;
 }
 
 bool SudokuGenerator::isSafe(int row, int col, int val, std::vector<std::vector<int>> board){
@@ -157,31 +187,3 @@ bool SudokuGenerator::notInBox(std::vector<std::vector<int>> board){
 
     return true;
 }
-
-bool SudokuGenerator::validateSudoku(std::vector<std::vector<int>> board){
-    return  notInRow(board) && notInCol(board) && notInBox(board);
-}
-
-
-std::vector<std::vector<int>> SudokuGenerator::removeKElements(int k){
-    std::vector<std::vector<int>> newPuzzle = sudokuBoard;
-
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::srand(seed);
-
-    int i = 0;
-    while(i < k){
-        int r = rand() % 9;
-        int c = rand() % 9;
-        if(newPuzzle[r][c] != EMPTY_VALUE){
-            newPuzzle[r][c] = EMPTY_VALUE;
-            i++;
-        }
-    }
-
-
-    return newPuzzle;
-}
-
-
-
