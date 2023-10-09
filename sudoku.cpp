@@ -1,7 +1,7 @@
 #include "ui_sudoku.h"
 #include "selectlevel.h"
 #include "maingame.h"
-#include "messages_dialog.h"
+#include "sudoku.h"
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>

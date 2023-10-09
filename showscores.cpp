@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QFile>
 #include <QIODevice>
+#include "sudoku.h"
 
 
 showScores::showScores(QWidget *parent) :
@@ -12,7 +13,7 @@ showScores::showScores(QWidget *parent) :
     ui(new Ui::showScores)
 {
     ui->setupUi(this);
-    p = (Sudoku*) parent;
+    Sudoku *p = (Sudoku*) parent;
 
     centralWid = p->centralWidget();
     centralWid->setParent(0);
@@ -26,9 +27,9 @@ showScores::showScores(QWidget *parent) :
     getAndPrintScores();
 }
 
-std::vector<GameData> showScores::readFile(QString filename){
-    std::vector<GameData> allLines;
-    GameData data;
+std::vector<GameData<QString>> showScores::readFile(QString filename){
+    std::vector<GameData<QString>> allLines;
+    GameData<QString> data;
 
     QString path = QDir::currentPath() + QDir::separator() + "gameData" + QDir::separator() + filename;
     QFile file(path);
@@ -49,7 +50,7 @@ std::vector<GameData> showScores::readFile(QString filename){
     return allLines;
 }
 
-void showScores::showFileContents(QString widgetName, std::vector<GameData> data){
+void showScores::showFileContents(QString widgetName, std::vector<GameData<QString>> data){
     QVBoxLayout *widLayout = new QVBoxLayout();
     int n = data.size();
     int bestTime = INT32_MAX;
@@ -110,19 +111,20 @@ void showScores::showFileContents(QString widgetName, std::vector<GameData> data
 }
 
 void showScores::getAndPrintScores(){
-    std::vector<GameData> easyScores = readFile("easy.dat");
+    std::vector<GameData<QString>> easyScores = readFile("easy.dat");
     showFileContents("easyWid", easyScores);
 
-    std::vector<GameData> mediumScores = readFile("medium.dat");
+    std::vector<GameData<QString>> mediumScores = readFile("medium.dat");
     showFileContents("mediumWid", mediumScores);
 
-    std::vector<GameData> hardScores = readFile("hard.dat");
+    std::vector<GameData<QString>> hardScores = readFile("hard.dat");
     showFileContents("hardWid", hardScores);
 
 }
 
 void showScores::goBack(){
     centralWid->setVisible(true);
+    Sudoku *p = qobject_cast<Sudoku*>( parentWidget());
     p->setCentralWidget(centralWid);
 
     close();

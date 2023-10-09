@@ -4,11 +4,11 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QFrame>
-#include "sudoku.h"
 #include <QTime>
 #include <QTimer>
 #include <QString>
-#include <QDataStream>
+#include <QResizeEvent>
+#include "inputbtnwidget.h"
 
 namespace Ui {
 class mainGame;
@@ -22,72 +22,58 @@ public:
     explicit mainGame(QWidget *parent = nullptr);
     ~mainGame();
 
+    void changeBtnValue(int v);
+
 private slots:
     void enableBtn();
-    void showBtnClicked();
     void showTimePassed();
     void backBtnClicked();
     void createNewGame();
     void highlightNumbers();
-
+    void setNull();
 
 private:
     Ui::mainGame *ui;
 
-    QPushButton *disabledBtn;
-    QWidget *centralWid;
-    Sudoku *p;
-    QTime *time;
-    QTimer *timer;
+    QPushButton *selectedBtn;
     QPushButton *options[10];
     QPushButton *button[9][9];
+
+    QWidget *centralWid;
+
+    QTime *time;
+    QTimer *timer;
+
     QString emptyStyle;
     QString highlightedStyle;
     QString normalStyle;
 
     int secondsPassed;
     int blocksToFill;
-    bool showBtnsEnabled;
     int currentHighlighted;
+    int level;
+
+    InputBtnWidget *inputButtons;
 
     std::vector<std::vector<int>> solvedPuzzle;
     std::vector<std::vector<int>> unSolvedPuzzle;
 
 
     QFrame *createLine(QString type);
+
     void createGrid();
-    void showOptions();
     void beginTimer();
     void gameCompletedMessage();
-    bool saveDataToFile(QString takenTime);
     void initializeStyles();
     void clearHighlightedNumbers();
+    void resizeEvent(QResizeEvent *event);
+
+    bool saveDataToFile(QString takenTime);
 
 
 };
 
 
-class GameData{
-public:
-    QString atDate;
-    QString timeTaken;
 
-    GameData(){}
-    GameData(QString date, QString time){
-        atDate = date;
-        timeTaken = time;
-    }
-
-    friend QDataStream &operator << (QDataStream &out, GameData data){
-        out << data.atDate << data.timeTaken;
-        return out;
-    }
-
-    friend QDataStream &operator >> (QDataStream &in, GameData &obj){
-        in >> obj.atDate >> obj.timeTaken;
-        return in;
-    }
-
-};
 
 #endif // MAINGAME_H

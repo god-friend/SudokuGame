@@ -1,12 +1,15 @@
 #include "maingame.h"
 #include "ui_maingame.h"
 #include <QGridLayout>
+#include "sudoku.h"
 #include "sudokugenerator.h"
 #include "messages_dialog.h"
 #include <QFile>
 #include <QIODevice>
 #include <QDir>
 #include <QDateTime>
+#include "gameData.h"
+
 
 
 mainGame::mainGame(QWidget *parent) :
@@ -15,11 +18,10 @@ mainGame::mainGame(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-
-    disabledBtn = Q_NULLPTR;
-    p = (Sudoku*) parent;
+    selectedBtn = Q_NULLPTR;
+    level = 0;
     currentHighlighted = EMPTY_VALUE;
+    inputButtons = Q_NULLPTR;
 
     initializeStyles();
     createGrid();
@@ -32,27 +34,35 @@ mainGame::mainGame(QWidget *parent) :
 }
 
 void mainGame::initializeStyles(){
-    normalStyle = "QPushButton{\
-                  color: rgb(0, 0, 0);\
-                  background-color: rgb(255,255,255);\
-                }\
-                 QPushButton:hover {\
-                    color: rgb(0, 0, 0);\
-                    background-color: rgb(176, 87, 217);\
-                }";
+    QString borderStyle = "border-radius: 25px;"
+        "border-style: outset;"
+                          "border-width: 2px;"
+        "border-color: black;";
 
-    emptyStyle = "QPushButton{\
-                    color: rgb(0, 0, 0);\
-                    background-color: rgb(96, 230, 225);\
-            }\
-                QPushButton:hover {\
-                    color: rgb(0, 0, 0);\
-                    background-color: rgb(176, 87, 217);\
-            }";
+    normalStyle = "QPushButton{"
+                  "color: rgb(0, 0, 0);"
+                  "background-color: rgb(255,255,255);"
+                  + borderStyle +
+                "}"
+                 "QPushButton:hover {"
+                    "color: rgb(0, 0, 0);"
+                    "background-color: rgb(176, 87, 217);"
+                "}";
+
+    emptyStyle = "QPushButton{"
+                    "color: rgb(0, 0, 0);"
+                    "background-color: rgb(96, 230, 225);"
+                 + borderStyle +
+                 "}"
+                "QPushButton:hover {"
+                    "color: rgb(0, 0, 0);"
+                    "background-color: rgb(176, 87, 217);"
+            "}";
 
     highlightedStyle = "QPushButton{"
                        "color: rgb(0,0,0);"
                        "background-color: green;"
+                       + borderStyle +
                        "}"
                        "QPushButton:hover{"
                        "color: rgb(0, 0, 0);"
@@ -79,13 +89,14 @@ QFrame *mainGame::createLine(QString type){
 
 void mainGame::createGrid(){
     const QSize btnSize = QSize(50, 50);
-    QGridLayout *grid = new QGridLayout(ui->frame);
+    QGridLayout *grid = new QGridLayout();
 
 
     SudokuGenerator sudokuGame;
     solvedPuzzle = sudokuGame.generateSudoku();
 
-    int level = p->getLevel();
+    Sudoku *p = qobject_cast<Sudoku*>( parentWidget());
+    level = p->getLevel();
 
     if(level == 1){
         unSolvedPuzzle = sudokuGame.removeKElements(18);
@@ -138,8 +149,7 @@ void mainGame::createGrid(){
     grid->setVerticalSpacing(0);
     grid->setHorizontalSpacing(0);
 
-    ui->frame->setLayout(grid);
-    showOptions();
+    ui->horLay->addLayout(grid);
 
     centralWid = p->centralWidget();
     centralWid->setParent(0);
@@ -168,7 +178,6 @@ void mainGame::beginTimer(){
 
 bool mainGame::saveDataToFile(QString takenTime){
     QString filename;
-    int level = p->getLevel();
     switch(level){
     case 1:
         filename = "easy.dat";
@@ -194,7 +203,7 @@ bool mainGame::saveDataToFile(QString takenTime){
     QDataStream outStream(&file);
     QDateTime currentDate = QDateTime::currentDateTime();
     QString formattedDate = currentDate.toString("dd.MM.yyyy");
-    GameData data(formattedDate, takenTime);
+    GameData<QString> data(formattedDate, takenTime);
 
     outStream << data;
 
@@ -205,7 +214,6 @@ bool mainGame::saveDataToFile(QString takenTime){
 }
 
 void mainGame::gameCompletedMessage(){
-    int level = p->getLevel();
     QString currentLevel = "";
     switch(level){
     case 1:
@@ -244,40 +252,69 @@ void mainGame::gameCompletedMessage(){
 
 }
 
-void mainGame::enableBtn(){
-    QPushButton* buttonSender = qobject_cast<QPushButton*>(sender());
-
-    if(buttonSender->isEnabled()){
-        if(disabledBtn != Q_NULLPTR){
-           disabledBtn->setEnabled(true);
-            QString btnText = disabledBtn->text();
-            if(btnText == " " || btnText.toInt() != currentHighlighted){
-                disabledBtn->setStyleSheet(emptyStyle);
-           }
-
+void mainGame::resizeEvent(QResizeEvent *event){
+    if(event->type() == QEvent::Resize){
+        if(inputButtons != Q_NULLPTR){
+            inputButtons->close();
         }
-        buttonSender->setStyleSheet(highlightedStyle);
-        buttonSender->setEnabled(false);
-
-        disabledBtn = buttonSender;
-    }
-
-    if(!showBtnsEnabled){
-        for(int i=0; i<10; i++){
-           options[i]->setEnabled(true);
-        }
-        showBtnsEnabled = true;
     }
 }
+
+void mainGame::enableBtn(){
+    QPushButton* buttonSender = qobject_cast<QPushButton*>(sender());
+    QRect btnPos = buttonSender->geometry();
+    QString btnId = buttonSender->objectName();
+
+    int n = btnId.length();
+    int row = btnId[n-3].digitValue();
+
+    if(inputButtons == Q_NULLPTR){
+        inputButtons = new InputBtnWidget(this);
+        inputButtons->setAttribute(Qt::WA_DeleteOnClose);
+        if(row < 3){
+            inputButtons->createAtPosition(DOWN, btnPos);
+        }else{
+            inputButtons->createAtPosition(UP, btnPos);
+        }
+
+        connect(inputButtons, SIGNAL(destroyed(QObject*)), this, SLOT(setNull()));
+        inputButtons->show();
+    }else{
+        inputButtons->close();
+    }
+
+    selectedBtn = buttonSender;
+}
+
+void mainGame::setNull(){
+    inputButtons = Q_NULLPTR;
+}
+
+void mainGame::changeBtnValue(int v){
+    QString text = QString::number(v);
+    QString objName = selectedBtn->objectName();
+    int n = objName.length();
+    int row = objName[n-3].digitValue();
+    int col = objName[n-1].digitValue();
+
+    if(selectedBtn->text() == " "){
+        blocksToFill -= 1;
+    }
+    selectedBtn->setText(text);
+    unSolvedPuzzle[row][col] = v;
+    if(blocksToFill == 0){
+        if(SudokuGenerator::validateSudoku(unSolvedPuzzle)){
+            gameCompletedMessage();
+        }
+    }
+}
+
 
 void mainGame::clearHighlightedNumbers(){
     for(int i=0; i<9; i++){
         for(int j=0; j<9; j++){
            QString objName = button[i][j]->objectName();
            if(objName.startsWith("e")){
-                if(!button[i][j]->isEnabled()){
-                    button[i][j]->setEnabled(true);
-                }
                 button[i][j]->setStyleSheet(emptyStyle);
            }else{
                 button[i][j]->setStyleSheet(normalStyle);
@@ -289,8 +326,9 @@ void mainGame::clearHighlightedNumbers(){
 void mainGame::highlightNumbers(){
     QPushButton* buttonSender = qobject_cast<QPushButton*>(sender());
     QString bText = buttonSender->text();
+    QString objName = buttonSender->objectName();
 
-    if(bText != " " && bText.toInt() != currentHighlighted){
+    if(bText != " " && bText.toInt() != currentHighlighted && !objName.startsWith("e")){
         // Clear Old Higlighted Numbers
         clearHighlightedNumbers();
 
@@ -308,83 +346,12 @@ void mainGame::highlightNumbers(){
            }
         }
         currentHighlighted = bText.toInt();
-    }else if(bText != " " && bText.toInt() == currentHighlighted){
+    }else if(bText != " " && bText.toInt() == currentHighlighted && !objName.startsWith("e")){
         currentHighlighted = EMPTY_VALUE;
         clearHighlightedNumbers();
     }
     else{
-        buttonSender->setStyleSheet(highlightedStyle);
-    }
-
-
-}
-
-void mainGame::showOptions(){
-    const QSize btnSize = QSize(30,30);
-    QGridLayout *frameLayout = new QGridLayout();
-
-
-    for(int i=0; i<9; i++){
-        options[i] = new QPushButton();
-        options[i]->setText(QString::number(i+1));
-        options[i]->setFixedSize(btnSize);
-        options[i]->setEnabled(false);
-
-        connect(options[i], SIGNAL(clicked(bool)), this, SLOT(showBtnClicked()));
-
-        frameLayout->addWidget(options[i], 0, i);
-    }
-
-    // Remove Number from Sudoku Grid (X) button
-    options[9] = new QPushButton();
-    options[9]->setText("X");
-    options[9]->setFont(QFont("Arial",20, QFont::Bold));
-    options[9]->setObjectName("removeVal");
-    options[9]->setFixedSize(btnSize);
-    options[9]->setEnabled(false);
-
-    connect(options[9], SIGNAL(clicked(bool)), this, SLOT(showBtnClicked()));
-
-    frameLayout->addWidget(options[9], 0, 9);
-    ui->optBtnFrame->setLayout(frameLayout);
-
-    showBtnsEnabled = false;
-}
-
-void mainGame::showBtnClicked(){
-    QPushButton *btn = qobject_cast<QPushButton *>(sender());
-    QString btnText = btn->text();
-
-    QString btnIndex = disabledBtn->objectName();
-
-    int objectNameSize = btnIndex.length();
-    int row = btnIndex[objectNameSize - 3].digitValue();
-    int col = btnIndex[objectNameSize - 1].digitValue();
-
-    if(btnText != "X"){
-        if(disabledBtn->text() == " "){
-            blocksToFill -= 1;
-        }
-        unSolvedPuzzle[row][col] = btnText.toInt();
-        disabledBtn->setText(btnText);
-
-    }else{
-        if(disabledBtn->text() != " "){
-           unSolvedPuzzle[row][col] = EMPTY_VALUE;
-           disabledBtn->setText(" ");
-           blocksToFill += 1;
-        }
-
-    }
-
-    if(blocksToFill == 0){
-
-        bool completed =  SudokuGenerator::validateSudoku(unSolvedPuzzle);
-
-        if(completed){
-           timer->stop();
-           gameCompletedMessage();
-        }
+        buttonSender->setStyleSheet(emptyStyle);
     }
 
 }
@@ -392,6 +359,7 @@ void mainGame::showBtnClicked(){
 void mainGame::backBtnClicked()
 {
     centralWid->setVisible(true);
+    Sudoku *p = qobject_cast<Sudoku*>( parentWidget());
     p->setCentralWidget(centralWid);
     if(!close()){
         qApp->quit();
@@ -406,7 +374,7 @@ void mainGame::showTimePassed(){
 }
 
 void mainGame::createNewGame(){
-
+    Sudoku *p = qobject_cast<Sudoku*>( parentWidget());
     p->setCentralWidget(centralWid);
     mainGame *newGame = new mainGame(p);
 

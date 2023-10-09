@@ -133,7 +133,7 @@
         <x>0</x>
         <y>0</y>
         <width>204</width>
-        <height>221</height>
+        <height>222</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -155,7 +155,7 @@
         <x>0</x>
         <y>0</y>
         <width>203</width>
-        <height>221</height>
+        <height>222</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -177,7 +177,7 @@
         <x>0</x>
         <y>0</y>
         <width>204</width>
-        <height>221</height>
+        <height>222</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -206,7 +206,19 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0);</string>
+        <string notr="true">QPushButton{
+	color: rgb(0, 0, 0);
+	background-color: rgb(153, 193, 241);
+	border-radius: 10px;
+	border-style: outset;
+	border-width: 2px;
+}
+QPushButton:hover {
+	background-color: rgb(26, 95, 180);
+}
+QPushButton:pressed {
+	background-color: rgb(220, 138, 221);
+}</string>
        </property>
        <property name="text">
         <string>Back</string>

@@ -2,8 +2,9 @@
 #define SHOWSCORES_H
 
 #include <QWidget>
-#include "maingame.h"
 #include <vector>
+#include "gameData.h"
+
 
 namespace Ui {
 class showScores;
@@ -22,12 +23,11 @@ private slots:
 
 private:
     Ui::showScores *ui;
-    Sudoku *p;
     QWidget *centralWid;
 
     void getAndPrintScores();
-    std::vector<GameData> readFile(QString filename);
-    void showFileContents(QString widgetName, std::vector<GameData> data);
+    std::vector<GameData<QString>> readFile(QString filename);
+    void showFileContents(QString widgetName, std::vector<GameData<QString>> data);
 };
 
 #endif // SHOWSCORES_H

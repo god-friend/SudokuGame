@@ -48,7 +48,19 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(0, 0, 0);</string>
+      <string notr="true">QPushButton{
+	color: rgb(0, 0, 0);
+	background-color: rgb(153, 193, 241);
+	border-radius: 10px;
+	border-style: outset;
+	border-width: 2px;
+}
+QPushButton:hover {
+	background-color: rgb(26, 95, 180);
+}
+QPushButton:pressed {
+	background-color: rgb(220, 138, 221);
+}</string>
      </property>
      <property name="text">
       <string>Cancel</string>
@@ -64,7 +76,19 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(0, 0, 0);</string>
+      <string notr="true">QPushButton{
+	color: rgb(0, 0, 0);
+	background-color: rgb(153, 193, 241);
+	border-radius: 10px;
+	border-style: outset;
+	border-width: 2px;
+}
+QPushButton:hover {
+	background-color: rgb(26, 95, 180);
+}
+QPushButton:pressed {
+	background-color: rgb(220, 138, 221);
+}</string>
      </property>
      <property name="text">
       <string>Ok</string>

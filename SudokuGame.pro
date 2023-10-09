@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    inputbtnwidget.cpp \
     main.cpp \
     maingame.cpp \
     messages_dialog.cpp \
@@ -18,6 +19,8 @@ SOURCES += \
     sudokugenerator.cpp
 
 HEADERS += \
+    gameData.h \
+    inputbtnwidget.h \
     maingame.h \
     messages_dialog.h \
     selectlevel.h \
@@ -37,4 +40,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES +=
+DESTDIR = $${PWD}/builds
+OBJECTS_DIR = $${DESTDIR}/.obj
+MOC_DIR = $${DESTDIR}/.mocs
+RCC_DIR = $${DESTDIR}/.rcc
+UI_DIR =  $${DESTDIR}/.ui

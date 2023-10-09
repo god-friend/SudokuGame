@@ -1,9 +1,7 @@
 #include "sudokugenerator.h"
-#include <iostream>
 #include <chrono>
 #include <random>
 #include <algorithm>
-#include <unordered_set>
 
 SudokuGenerator::SudokuGenerator()
 {
